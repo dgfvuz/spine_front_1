@@ -8,9 +8,15 @@ export default defineConfig({
   plugins: [
     vue(),
   ],
+  server: {
+    port: 8888,
+    cors: true, // 允许跨域
+    hmr: true, // 开启热更新
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
-  }
+  },
+  base: './', // 设置打包路径
 })
