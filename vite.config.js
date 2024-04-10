@@ -13,10 +13,22 @@ export default defineConfig({
     cors: true, // 允许跨域
     hmr: true, // 开启热更新
   },
+  pluginOptions: {
+
+    electronBuilder: {
+    
+    customFileProtocol: "./"
+    
+    }
+    
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
   base: './', // 设置打包路径
+  build: {
+    chunkSizeWarningLimit: 1000 // Set to 600KB
+  }
 })
