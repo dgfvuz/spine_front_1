@@ -5,8 +5,8 @@ import Me from '@/views/home/Me.vue'
 const isElectron = typeof process !== 'undefined' ? process.env.IS_ELECTRON : import.meta.env.IS_ELECTRON;
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  // mode: isElectron ? 'hash' : 'history',
-   mode: 'hash',
+   mode: isElectron ? 'hash' : 'history',
+  //  mode: 'hash',
   routes: [
     {
       path:'/',
