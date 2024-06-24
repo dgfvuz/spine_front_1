@@ -2,7 +2,12 @@
     "productName": "spine_front_1",
     "files": ["./electron/main.js", "./dist"],
     "extraFiles": ["./videos", "./cvideo"], 
+    "win":{
+      // "target": "nsis",
+      "icon": "./public/favicon.ico"
+    },
     "directories": {
       "output": "./builder"
     }
+    
   }

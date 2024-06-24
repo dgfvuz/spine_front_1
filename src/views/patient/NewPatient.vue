@@ -1,6 +1,6 @@
 <template>
     <div class="about">
-      <h1>This page helps you to upload x ray image</h1>
+      <h1>这里上传x光照片</h1>
     </div>
   </template>
   

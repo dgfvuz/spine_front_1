@@ -1,6 +1,6 @@
 <template>
     <div class="about">
-      <h1>This is an video page</h1>
+      <h1>演示视频页面</h1>
     </div>
   </template>
   

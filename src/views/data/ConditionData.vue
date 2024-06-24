@@ -1,6 +1,6 @@
 <template>
     <div class="about">
-      <h1>you can get data by some condition</h1>
+      <h1>条件查询筛选患者</h1>
     </div>
   </template>
   

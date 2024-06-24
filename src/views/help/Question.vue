@@ -1,6 +1,6 @@
 <template>
     <div class="about">
-      <h1>raise your question here</h1>
+      <h1>问题反馈页面</h1>
     </div>
   </template>
   

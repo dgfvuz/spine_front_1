@@ -1,6 +1,6 @@
 <template>
     <div class="about">
-      <h1>approved patient x ray image will be represented here</h1>
+      <h1>审核通过患者</h1>
     </div>
   </template>
   

@@ -1,6 +1,6 @@
 <template>
     <div class="about">
-      <h1>we can do some data analysis here</h1>
+      <h1>数据分析(将会有图表)</h1>
     </div>
   </template>
   

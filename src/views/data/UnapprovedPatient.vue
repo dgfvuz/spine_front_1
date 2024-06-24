@@ -1,6 +1,6 @@
 <template>
     <div class="about">
-      <h1>unapproved patient x ray image will be presented here</h1>
+      <h1>未审核患者</h1>
     </div>
   </template>
   

@@ -1,6 +1,6 @@
 <template>
     <div class="about">
-      <h1>you can get all data here</h1>
+      <h1>所有数据</h1>
     </div>
   </template>
   

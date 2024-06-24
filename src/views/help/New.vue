@@ -1,6 +1,6 @@
 <template>
     <div class="about">
-      <h1>This is an new function description page</h1>
+      <h1>新功能将在这里展示</h1>
     </div>
   </template>
   

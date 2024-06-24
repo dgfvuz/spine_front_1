@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import defaultLayout from '@/layout/defaultLayout.vue'
 import Me from '@/views/home/Me.vue'
+import { useUserStore } from '@/stores/user'
 const isElectron = typeof process !== 'undefined' ? process.env.IS_ELECTRON : import.meta.env.IS_ELECTRON;
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -10,11 +11,26 @@ const router = createRouter({
   routes: [
     {
       path:'/',
+      meta:{isAuth:false,isAdmin:false},
       redirect:'/login'
+    },
+    {
+      path: '/admin',
+      name: '管理员',
+      meta:{isAuth:true,isAdmin:true},
+      component: defaultLayout,
+      children: [
+        {
+          path: 'users',
+          name: '用户管理',
+          component: () => import('@/views/users/UserManage.vue')
+        }
+      ]
     },
     {
       path: '/home',
       name: '主页',
+      meta:{isAuth:true,isAdmin:false},
       component: defaultLayout,
       children: [
         {
@@ -42,12 +58,14 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
+      meta:{isAuth:false,isAdmin:false},
       component: () => import('@/views/LoginView.vue')
     },
 
     {
       path:'/patient',
       name:'患者管理',
+      meta:{isAuth:true,isAdmin:false},
       component:defaultLayout,
       children:[
         {
@@ -70,6 +88,7 @@ const router = createRouter({
     {
       path:'/data',
       name:'数据统计',
+      meta:{isAuth:true,isAdmin:false},
       component:defaultLayout,
       children:[
         {
@@ -107,6 +126,7 @@ const router = createRouter({
     {
       path:'/help',
       name:'帮助中心',
+      meta:{isAuth:true,isAdmin:false},
       component:defaultLayout,
       children:[
         {
@@ -141,6 +161,7 @@ const router = createRouter({
         }
       ]
     },
+
     // {
     //   path: '/about',
     //   name: 'about',
@@ -151,5 +172,16 @@ const router = createRouter({
     // }
   ]
 })
-
+router.beforeEach((to, from, next) => {
+  if (to.meta.isAuth) {
+    console.log('isAuth')
+    if (useUserStore().user.is_logged_in) {
+      next()
+    } else {
+      next('/login')
+    }
+  }else{
+    next()
+  }
+})
 export default router

@@ -1,6 +1,6 @@
 <template>
     <div class="about">
-      <h1>this is a collection page</h1>
+      <h1>收藏的患者</h1>
     </div>
   </template>
   

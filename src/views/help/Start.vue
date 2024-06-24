@@ -1,6 +1,6 @@
 <template>
     <div class="about">
-      <h1>Get start quickly</h1>
+      <h1>快速上手</h1>
     </div>
   </template>
   

@@ -12,6 +12,13 @@ export default defineConfig({
     port: 8888,
     cors: true, // 允许跨域
     hmr: true, // 开启热更新
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
+    }
   },
   pluginOptions: {
 

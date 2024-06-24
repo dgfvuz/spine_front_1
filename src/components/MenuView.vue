@@ -1,38 +1,30 @@
 <template>
-        <el-menu
-          default-active="2"
-          class="el-menu-vertical-demo"
-          @open="handleOpen"
-          @close="handleClose"
-        >
-        <el-sub-menu v-for="item in menuData" :key="item.path" :index="item.name" class="el-submenu-demo">
+      <el-menu class="verticalMenu">
+        <el-sub-menu v-for="item in menuData" :index="item.name" class="fatherMenu">
           <template #title>
-              <!-- <el-icon><location /></el-icon> -->
-              <span>{{ item.name }}</span>
+            <span>{{ item.name }}</span>
           </template>
-          <el-menu-item v-for="subItem in item.children" :key="subItem.path" :index="subItem.name" @click="handleClick(item,subItem)" class="el-menuItem-demo">
-            <span>{{ subItem.name }}</span>
+          <el-menu-item v-for="subItem in item.children" :index="subItem.name" @click="handleClick(item,subItem)" class="sonMenu">
+            {{ subItem.name }}
           </el-menu-item>
         </el-sub-menu>
-        </el-menu>
+      </el-menu>
   </template>
   
-  <script lang="js" setup>
+  <script lang="ts" setup>
   import router from '@/router'
   import {onMounted} from 'vue'
   import { ref } from 'vue'
-  import {
-    Document,
-    Menu as IconMenu,
-    Location,
-    Setting,
-  } from '@element-plus/icons-vue'
-  const menuData = ref(router.options.routes.filter(route => (route.path !== '/login')&& (route.path !== '/register')&& (route.path !== '/')))
+  import { useUserStore } from "@/stores/user";
+  const menuData = ref(router.options.routes.filter(route => (route.meta.isAdmin === useUserStore().user.is_superuser)&&(route.path !== '/login')&& (route.path !== '/register')&& (route.path !== '/')))
   // 在加载页面的时候执行的函数
-  onMounted(() => {
-    //console.log(menuData)
-    // 递归生成菜单
-  })
+  const subMenuVisibility = ref({})
+  const toggleSubMenu = (path) => {
+    subMenuVisibility.value[path] = !subMenuVisibility.value[path]
+  }
+  const isSubMenuVisible = (path) => {
+    return subMenuVisibility.value[path]
+  }
   const handleOpen = (key, keyPath) => {
     // console.log(key, keyPath)
   }
@@ -44,7 +36,19 @@
   }
   </script>
   <style>
-  .el-menu-vertical-demo{
+  .verticalMenu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
     height: 100%;
+    overflow-y: auto;
   }
+  .fatherMenu {
+    width: 100%;
+  }
+  .sonMenu {
+    width: 100%;
+  }
+
   </style>

@@ -1,6 +1,6 @@
 <template>
     <div class="about">
-      <h1>patient timeLine</h1>
+      <h1>患者病历信息</h1>
     </div>
   </template>
   

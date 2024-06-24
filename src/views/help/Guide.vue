@@ -1,6 +1,6 @@
 <template>
     <div class="about">
-      <h1>This is an guide page</h1>
+      <h1>指南</h1>
     </div>
 </template>
   

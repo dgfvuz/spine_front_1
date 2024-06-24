@@ -7,6 +7,7 @@ function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
+    icon: path.join(__dirname, '../public/favicon.ico'), // 设置图标
     webPreferences: {
       // 书写渲染进程中的配置
       nodeIntegration: true, //开启true这一步很重要,目的是为了vue文件中可以引入node和electron相关的API
@@ -15,7 +16,7 @@ function createWindow() {
     },
   })
  
-  let env = 'pro2'
+  let env = 'pro1'
   // 配置热更新
   if (env == 'pro') {
     const elePath = path.join(__dirname, '../node_modules/electron')
@@ -28,7 +29,7 @@ function createWindow() {
     mainWindow.webContents.openDevTools()
   } else {
     // 生产环境中要加载文件，打包的版本
-    // Menu.setApplicationMenu(null)
+    Menu.setApplicationMenu(null)
     // 加载 index.html
     mainWindow.loadFile(path.resolve(__dirname, '../dist/index.html')) // 新增
   }
