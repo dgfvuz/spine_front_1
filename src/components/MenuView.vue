@@ -1,13 +1,9 @@
 <template>
       <el-menu class="verticalMenu">
-        <el-sub-menu v-for="item in menuData" :index="item.name" class="fatherMenu">
-          <template #title>
-            <span>{{ item.name }}</span>
-          </template>
-          <el-menu-item v-for="subItem in item.children" :index="subItem.name" @click="handleClick(item,subItem)" class="sonMenu">
+          <el-menu-item v-for="subItem in menuData " 
+          :index="subItem.name" @click="handleClick(subItem)">
             {{ subItem.name }}
           </el-menu-item>
-        </el-sub-menu>
       </el-menu>
   </template>
   
@@ -16,7 +12,9 @@
   import {onMounted} from 'vue'
   import { ref } from 'vue'
   import { useUserStore } from "@/stores/user";
-  const menuData = ref(router.options.routes.filter(route => (route.meta.isAdmin === useUserStore().user.is_superuser)&&(route.path !== '/login')&& (route.path !== '/register')&& (route.path !== '/')))
+  const menuData = ref(router.options.routes.filter(route => (route.path === '/default'))[0].children.filter(subItem => (subItem.meta.isAdmin === useUserStore().user.is_superuser) && subItem.meta.showMenu))
+  console.log(menuData.value)
+  console.log("上面是menuData")
   // 在加载页面的时候执行的函数
   const subMenuVisibility = ref({})
   const toggleSubMenu = (path) => {
@@ -31,8 +29,8 @@
   const handleClose = (key, keyPath) => {
     // console.log(key, keyPath)
   }
-  const handleClick = (item,subItem) => {
-    router.push(item.path + '/'+subItem.path)
+  const handleClick = (subItem: any) => {
+    router.push('/default/'+subItem.path)
   }
   </script>
   <style>

@@ -2,7 +2,7 @@
   <div class="container">
     <el-form
       ref="ruleFormRef"
-      style="max-width: 600px"
+      style="width: 300px"
       :model="ruleForm"
       status-icon
       :rules="rules"
@@ -17,6 +17,7 @@
           v-model="ruleForm.password"
           type="password"
           autocomplete="off"
+            show-password
         />
       </el-form-item>
       <el-form-item v-if="is_register" label="确认密码" prop="checkPass">
@@ -139,9 +140,9 @@ async function loginUser() {
         type: "success",
       })
       if (res.data.is_superuser) {
-        router.push("/admin/users");
+        router.push("/default/users");
       } else{
-        router.push("/home/todo");
+        router.push("/default/patient");
       }
     } else {
       ElMessage({

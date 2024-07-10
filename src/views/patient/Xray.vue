@@ -68,7 +68,6 @@ import { ref } from "vue";
 import { useUserStore } from "@/stores/user";
 import axiosInstance from "@/http";
 import { ElMessage } from "element-plus";
-import router from "@/router";
 const ReportDatas = ref([]);
 const totalNum = ref(0);
 const selectedReport = ref(null);
@@ -115,9 +114,7 @@ const fetchReport = async () => {
   try {
     var params = {
       p: currentPage.value,
-      status: "未审核"
     };
-    console.log(params);
     const response = await axiosInstance.get("/report/list/", {
       params: params,
     });
@@ -155,6 +152,7 @@ const handleUpdate = async () => {
       "/report/detail/" + selectedReport.value.id + "/",
       {
         results: selectedReport.value.results,
+        status: "已审核"
       }
     );
     fetchReport();
