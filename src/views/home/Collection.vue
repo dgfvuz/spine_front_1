@@ -209,7 +209,7 @@ const editPatient = ref({
   gender: "",
 });
 const triggerFileInput = (index: number, row: any) => {
-  report.value.patient = row.id;
+  report.value.patient = row.patient;
   fileInput.value.click();
 };
 const fetchPatients = async () => {

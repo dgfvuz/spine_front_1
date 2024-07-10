@@ -1,41 +1,47 @@
 <template>
-  <div class="xray">
-    <el-card
+  <div class="todo">
+    <div class="dashboard">
+      <div class="dashboard1"></div>
+      <div class="dashboard2"></div>
+    </div>
+    <div class="xray">
+      <el-card
       v-for="item in ReportDatas"
       style="height: 400px; overflow-y: auto"
-    >
+      >
       <p>患者名称: {{ item.patient_name }}</p>
       <el-image
-        style="width: 100px; height: 100px"
-        :src="item.X_ray"
-        fit="contain"
+      style="width: 100px; height: 100px"
+      :src="item.X_ray"
+      fit="contain"
       />
       <p>报告结果: {{ processResults(item.results) }}</p>
       <p>报告状态: {{ item.status }}</p>
       <p>更新时间: {{ item.update_time }}</p>
       <div>
         <el-button type="primary" @click="reportDetail(item)"
-          >查看详情</el-button
+        >查看详情</el-button
         >
         <el-button type="primary" @click="handleRegenerate(item)"
-          >重新生成</el-button
+        >重新生成</el-button
         >
         <el-button type="primary" @click="handleDelete(item)">删除</el-button>
       </div>
     </el-card>
   </div>
   <el-pagination
-      @current-change="handleCurrentChange"
-      :current-page="currentPage"
-      :page-size="10"
-      layout="prev, pager, next"
-      :total="totalNum"
-        id="reportPagination"
-    ></el-pagination>
+  @current-change="handleCurrentChange"
+  :current-page="currentPage"
+  :page-size="10"
+  layout="prev, pager, next"
+  :total="totalNum"
+  id="reportPagination"
+  ></el-pagination>
+</div>
   <el-dialog
-    title="报告详情"
-    v-model="reportDetailVisiable"
-    style="width: 100%; height: 100%; display: flex"
+  title="报告详情"
+  v-model="reportDetailVisiable"
+  style="width: 100%; height: 100%; display: flex"
   >
     <el-image
       style="width: 100px; height: 100px"
@@ -170,16 +176,22 @@ const handleCurrentChange = (val: number) => {
 </script>
 
 <style>
-.xray {
+.todo{
   width: 100%;
-  height: 95%;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
 }
 
+.xray {
+  flex:1;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
 #reportPagination {
-  height: 5%;
   width:100%;
 }
 </style>
