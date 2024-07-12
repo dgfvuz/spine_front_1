@@ -64,9 +64,34 @@ const router = createRouter({
           name: "患者X光",
           component: () => import("@/views/patient/PatientXray.vue"),
           meta: { isAuth: true, isAdmin: false,showMenu:false},
-        }
-      ]
-    },
+        },
+        {
+          path:"data",
+          name: "数据统计",
+          component: () => import("@/views/data/AllData.vue"),
+          meta: { isAuth: true, isAdmin: false,showMenu:true},
+          children:[
+            {
+              path: "ageData",
+              name: "年龄统计",
+              component: () => import("@/views/data/AgeData.vue"),
+              meta: { isAuth: true, isAdmin: false,showMenu:true},
+
+            },
+            {
+              path: "genderData",
+              name: "性别统计",
+              component: () => import("@/views/data/GenderData.vue"),
+              meta: { isAuth: true, isAdmin: false,showMenu:true},
+            },
+            {
+              path: "regionData",
+              name: "地区统计",
+              component: () => import("@/views/data/RegionData.vue"),
+              meta: { isAuth: true, isAdmin: false,showMenu:true},
+            },
+          ]
+    },]},
     {
       path: "/",
       meta: { isAuth: false, isAdmin: false, showMenu:false},
@@ -78,161 +103,6 @@ const router = createRouter({
       meta: { isAuth: false, isAdmin: false },
       component: () => import("@/views/LoginView.vue"),
     },
-    // {
-    //   path: "/admin",
-    //   name: "管理员",
-    //   meta: { isAuth: true, isAdmin: true,showMenu:true},
-    //   component: defaultLayout,
-    //   children: [
-    //     {
-    //       path: "users",
-    //       name: "用户管理",
-    //       component: () => import("@/views/users/UserManage.vue"),
-    //     },
-    //   ],
-    // },
-    // {
-    //   path: "/home",
-    //   name: "主页",
-    //   meta: { isAuth: true, isAdmin: false ,showMenu:true},
-    //   component: defaultLayout,
-    //   children: [
-    //     {
-    //       path: "todo",
-    //       name: "我的待办",
-    //       component: () => import("@/views/home/Todo.vue"),
-    //     },
-    //     {
-    //       path: "collection",
-    //       name: "我的收藏",
-    //       component: () => import("@/views/home/Collection.vue"),
-    //     },
-    //     {
-    //       path: "me",
-    //       name: "账号信息",
-    //       component: Me,
-    //     },
-    //     {
-    //       path: "security",
-    //       name: "安全设置",
-    //       component: () => import("@/views/home/Account.vue"),
-    //     },
-    //   ],
-    // },
-
-    // {
-    //   path: "/patient",
-    //   name: "患者管理",
-    //   meta: { isAuth: true, isAdmin: false },
-    //   component: defaultLayout,
-    //   children: [
-    //     {
-    //       path: "add",
-    //       name: "添加患者",
-    //       component: () => import("@/views/patient/NewPatient.vue"),
-    //     },
-    //     {
-    //       path: "search",
-    //       name: "患者查询",
-    //       component: () => import("@/views/patient/SearchPatient.vue"),
-    //     },
-    //     {
-    //       path: "result",
-    //       name: "查询结果",
-    //       component: () => import("@/views/patient/SearchResult.vue"),
-    //     },
-    //     {
-    //       path: "Xray",
-    //       name: "X光",
-    //       component: () => import("@/views/patient/Xray.vue"),
-    //     },
-    //   ],
-    // },
-    // {
-    //   path: "/data",
-    //   name: "数据统计",
-    //   meta: { isAuth: true, isAdmin: false },
-    //   component: defaultLayout,
-    //   children: [
-    //     {
-    //       path: "all",
-    //       name: "全部数据",
-    //       component: () => import("@/views/data/AllData.vue"),
-    //     },
-    //     {
-    //       path: "condition",
-    //       name: "条件查询",
-    //       component: () => import("@/views/data/ConditionData.vue"),
-    //     },
-    //     {
-    //       path: "timeline",
-    //       name: "患者时间轴",
-    //       component: () => import("@/views/data/PatientTimeline.vue"),
-    //     },
-    //     {
-    //       path: "analysis",
-    //       name: "数据统计",
-    //       component: () => import("@/views/data/DataAnalysis.vue"),
-    //     },
-    //     {
-    //       path: "approved",
-    //       name: "已审核",
-    //       component: () => import("@/views/data/ApprovedPatient.vue"),
-    //     },
-    //     {
-    //       path: "unapproved",
-    //       name: "未审核",
-    //       component: () => import("@/views/data/UnapprovedPatient.vue"),
-    //     },
-    //   ],
-    // },
-    // {
-    //   path: "/help",
-    //   name: "帮助中心",
-    //   meta: { isAuth: true, isAdmin: false },
-    //   component: defaultLayout,
-    //   children: [
-    //     {
-    //       path: "start",
-    //       name: "快速上手",
-    //       component: () => import("@/views/help/Start.vue"),
-    //     },
-    //     {
-    //       path: "guide",
-    //       name: "操作指南",
-    //       component: () => import("@/views/help/Guide.vue"),
-    //     },
-    //     {
-    //       path: "question",
-    //       name: "常见问题",
-    //       component: () => import("@/views/help/Question.vue"),
-    //     },
-    //     {
-    //       path: "manual",
-    //       name: "使用手册",
-    //       component: () => import("@/views/help/Manual.vue"),
-    //     },
-    //     {
-    //       path: "video",
-    //       name: "视频教程",
-    //       component: () => import("@/views/help/Video.vue"),
-    //     },
-    //     {
-    //       path: "new",
-    //       name: "新功能介绍",
-    //       component: () => import("@/views/help/New.vue"),
-    //     },
-    //   ],
-    // },
-
-    // {
-    //   path: '/about',
-    //   name: 'about',
-    //   // route level code-splitting
-    //   // this generates a separate chunk (About.[hash].js) for this route
-    //   // which is lazy-loaded when the route is visited.
-    //   component: () => import('../views/AboutView.vue')
-    // }
   ],
 });
 router.beforeEach((to, from, next) => {

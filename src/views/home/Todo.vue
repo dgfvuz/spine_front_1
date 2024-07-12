@@ -1,8 +1,7 @@
 <template>
   <div class="todo">
     <div class="dashboard">
-      <div class="dashboard1"></div>
-      <div class="dashboard2"></div>
+      <div id="bar-chart"></div>
     </div>
     <div class="xray">
       <el-card
@@ -75,6 +74,47 @@ import { useUserStore } from "@/stores/user";
 import axiosInstance from "@/http";
 import { ElMessage } from "element-plus";
 import router from "@/router";
+import { onMounted, onUnmounted } from "vue";
+import {CanvasRenderer} from "echarts/renderers";
+// 引入 ECharts 主模块
+import * as echarts from 'echarts/core';
+import { BarChart } from 'echarts/charts';
+import { GridComponent, TooltipComponent } from 'echarts/components';
+
+echarts.use([BarChart, GridComponent, TooltipComponent, CanvasRenderer]);
+
+const initChart = () => {
+  const chartDom = document.getElementById('bar-chart');
+  const myChart = echarts.init(chartDom);
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow'
+      }
+    },
+    xAxis: {
+      type: 'value'
+    },
+    yAxis: {
+      type: 'category',
+      data: ['今日新增患者数量', '今日新增报告数量']
+    },
+    series: [
+      {
+        type: 'bar',
+        data: [120, 200],
+        barWidth: '60%',
+      }
+    ]
+  };
+  myChart.setOption(option);
+};
+
+
+onMounted(() => {
+  initChart();
+});
 const ReportDatas = ref([]);
 const totalNum = ref(0);
 const selectedReport = ref(null);
@@ -193,5 +233,22 @@ const handleCurrentChange = (val: number) => {
 
 #reportPagination {
   width:100%;
+}
+.dashboard {
+  display: flex;
+  width: 100%;
+  height: 400px;
+}
+#gauge1 {
+  width: 50%;
+  height: 400px;
+}
+#gauge2 {
+  width: 50%;
+  height: 400px;
+}
+#bar-chart {
+  width: 100%;
+  height: 400px;
 }
 </style>
