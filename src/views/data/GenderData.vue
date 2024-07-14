@@ -1,70 +1,98 @@
 <template>
-    <div id="genderData"></div>
-  </template>
-  
-  <script lang="ts" setup>
-  import { onMounted } from 'vue';
-  import * as echarts from 'echarts';
-  import { ref } from 'vue'
-  
-  const activeIndex = ref('1')
-  const activeIndex2 = ref('1')
-  const handleSelect = (key: string, keyPath: string[]) => {
-    console.log(key, keyPath)
-  }
-  
-  const genderDataOption = {
-    title: {
-      text: '性别统计',
-      left: 'center'
-    },
-    tooltip: {
-      trigger: 'item',
-      // 在这个配置中，{a}、{b}、{c} 和 {d} 是特殊的变量，分别代表系列名、数据项名称、数据项值和百分比。
-      formatter: '表项及数目: {c} <br/>占比: ({d}%)'
-    },
-    legend: {
-      orient: 'vertical',
-      left: 'left',
-    },
-    dataset: {
-      source: [
-        ['Age', 'Count'],
-        ['0-10', 10],
-        ['11-20', 20],
-        ['21-30', 30],
-        ['31-40', 40],
-        ['41-50', 50],
-        ['51-60', 60],
-        ['61-70', 70],
-        ['71-80', 80],
-        ['81-90', 90],
-        ['91-100', 100],
-      ]
-    },
-    series: [
-      {
-        name: 'Age Data',
-        type: 'pie',
-        radius: '50%',
-        label: {
-          formatter: '{b}: {d}%'
+  <div id="genderData"></div>
+</template>
+
+<script lang="ts" setup>
+import { onMounted } from "vue";
+import * as echarts from "echarts";
+import { ref } from "vue";
+import axiosInstance from "@/http";
+import { ElMessage } from "element-plus";
+
+const genderDataOption = ref({
+  title: {
+    text: "脊柱侧弯性别统计",
+    left: "center",
+  },
+  tooltip: {
+    trigger: "item",
+    // 在这个配置中，{a}、{b}、{c} 和 {d} 是特殊的变量，分别代表系列名、数据项名称、数据项值和百分比。
+    formatter: "表项及数目: {c} <br/>",
+  },
+  legend: {
+    orient: "vertical",
+    left: "left",
+  },
+  dataset: {
+    source: [
+      ["Gender", "Count"],
+      ["男", 10],
+      ["女", 20],
+    ],
+  },
+  yAxis: {
+    type: "category",
+  },
+  xAxis: {
+    type: "value",
+  },
+  series: [
+    {
+      name: "性别统计数据",
+      type: "bar",
+      label: {
+        show: true,
+        position: "inside",
+      },
+      itemStyle: {
+        color: function (params) {
+          var colorlist = ["#32585a", "#00ff77"];
+          return colorlist[params.dataIndex % 2];
         },
+      },
+    },
+  ],
+});
+
+const fetchData = async () => {
+  const source = ref(genderDataOption.value.dataset.source);
+  try {
+    for (let i = 1; i < genderDataOption.value.dataset.source.length; i++) {
+      const gender = genderDataOption.value.dataset.source[i][0];
+      if (typeof gender !== "string") {
+        continue;
       }
-    ]
-  };
-  onMounted(() => {
-    console.log('mounted');
-    const genderData = echarts.init(document.getElementById('genderData'));
-    genderData.setOption(genderDataOption);
-  });
-  </script>
+      const res = await axiosInstance.get(`/report/analysis/`, {
+        params: {
+          gender: gender,
+          result: "异常",
+        },
+      });
+      genderDataOption.value.dataset.source[i][1] = res.data.count;
+    }
+  } catch (e) {
+    ElMessage({
+      message: "获取性别信息失败",
+      type: "error",
+    });
+  }
+  render();
+};
 
+const render = () => {
+  console.log("render");
+  const genderData = echarts.init(document.getElementById("genderData"));
+  genderData.setOption(genderDataOption.value);
+};
 
-  <style>
-   #genderData{
+onMounted(() => {
+  fetchData();
+});
+</script>
+
+<style>
+#genderData {
   width: 100%;
   height: 100%;
 }
-  </style>
-  
+</style>

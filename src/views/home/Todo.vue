@@ -5,42 +5,42 @@
     </div>
     <div class="xray">
       <el-card
-      v-for="item in ReportDatas"
-      style="height: 400px; overflow-y: auto"
+        v-for="item in ReportDatas"
+        style="height: 200px; overflow-y: auto"
       >
-      <p>患者名称: {{ item.patient_name }}</p>
-      <el-image
+        <p>患者名称: {{ item.patient_name }}</p>
+        <!-- <el-image
       style="width: 100px; height: 100px"
       :src="item.X_ray"
       fit="contain"
-      />
-      <p>报告结果: {{ processResults(item.results) }}</p>
-      <p>报告状态: {{ item.status }}</p>
-      <p>更新时间: {{ item.update_time }}</p>
-      <div>
-        <el-button type="primary" @click="reportDetail(item)"
-        >查看详情</el-button
-        >
-        <el-button type="primary" @click="handleRegenerate(item)"
-        >重新生成</el-button
-        >
-        <el-button type="primary" @click="handleDelete(item)">删除</el-button>
-      </div>
-    </el-card>
+      /> -->
+        <p>报告结果: {{ processResults(item.results) }}</p>
+        <p>报告状态: {{ item.status }}</p>
+        <p>更新时间: {{ item.update_time }}</p>
+        <div>
+          <el-button type="primary" @click="reportDetail(item)"
+            >查看详情</el-button
+          >
+          <el-button type="primary" @click="handleRegenerate(item)"
+            >重新生成</el-button
+          >
+          <el-button type="primary" @click="handleDelete(item)">删除</el-button>
+        </div>
+      </el-card>
+    </div>
+    <el-pagination
+      @current-change="handleCurrentChange"
+      :current-page="currentPage"
+      :page-size="10"
+      layout="prev, pager, next"
+      :total="totalNum"
+      id="reportPagination"
+    ></el-pagination>
   </div>
-  <el-pagination
-  @current-change="handleCurrentChange"
-  :current-page="currentPage"
-  :page-size="10"
-  layout="prev, pager, next"
-  :total="totalNum"
-  id="reportPagination"
-  ></el-pagination>
-</div>
   <el-dialog
-  title="报告详情"
-  v-model="reportDetailVisiable"
-  style="width: 100%; height: 100%; display: flex"
+    title="报告详情"
+    v-model="reportDetailVisiable"
+    style="width: 100%; height: 100%; display: flex"
   >
     <el-image
       style="width: 100px; height: 100px"
@@ -50,6 +50,7 @@
     <p>患者名称: {{ selectedReport.patient_name }}</p>
     <div>
       <span>报告结果:</span>
+      <el-input v-model="selectedReport.result"></el-input>
       <div v-for="key in parts">
         <span>{{ key }}</span>
         <el-input v-model="selectedReport.results[key]['cobb']"></el-input>
@@ -75,45 +76,71 @@ import axiosInstance from "@/http";
 import { ElMessage } from "element-plus";
 import router from "@/router";
 import { onMounted, onUnmounted } from "vue";
-import {CanvasRenderer} from "echarts/renderers";
+import { CanvasRenderer } from "echarts/renderers";
 // 引入 ECharts 主模块
-import * as echarts from 'echarts/core';
-import { BarChart } from 'echarts/charts';
-import { GridComponent, TooltipComponent } from 'echarts/components';
+import * as echarts from "echarts";
 
-echarts.use([BarChart, GridComponent, TooltipComponent, CanvasRenderer]);
+const option = ref({
+  legend: {
+    show: false,
+  },
+  tooltip: {},
+  dataset: {
+    // 提供一份数据。
+    source: [
+      ["类型", "数量"],
+      ["今日新增患者", 100],
+      ["今日新增报告", 200],
+      ["今日未审核报告", 100],
+    ],
+  },
+  // 声明一个 X 轴，类目轴（category）。默认情况下，类目轴对应到 dataset 第一列。
+  xAxis: { type: "value", show: false },
+  // 声明一个 Y 轴，数值轴。
+  yAxis: {
+    type: "category",
+    axisLine: {
+      show: false,
+    },
+  },
+  // 声明多个 bar 系列，默认情况下，每个系列会自动对应到 dataset 的每一列。
+  series: [
+    {
+      type: "bar",
+      grid: {
+        top: "10%", // 增加上边距
+        bottom: "100%", // 增加下边距
+      },
+      label: {
+        show: true,
+        position: "inside",
+      },
+      barCategoryGap: "20%",
+      barGap: "5%",
+      itemStyle: {
+        color: function (params) {
+          var colorlist = [
+            "#E67716",
+            "#FBC300",
+            "#11440f",
+            "#32585a",
+            "#00ff77",
+          ];
+          return colorlist[params.dataIndex % 5];
+        },
+      },
+    },
+  ],
+});
 
 const initChart = () => {
-  const chartDom = document.getElementById('bar-chart');
+  const chartDom = document.getElementById("bar-chart");
   const myChart = echarts.init(chartDom);
-  const option = {
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: {
-        type: 'shadow'
-      }
-    },
-    xAxis: {
-      type: 'value'
-    },
-    yAxis: {
-      type: 'category',
-      data: ['今日新增患者数量', '今日新增报告数量']
-    },
-    series: [
-      {
-        type: 'bar',
-        data: [120, 200],
-        barWidth: '60%',
-      }
-    ]
-  };
-  myChart.setOption(option);
+  myChart.setOption(option.value);
 };
 
-
 onMounted(() => {
-  initChart();
+  fetchData();
 });
 const ReportDatas = ref([]);
 const totalNum = ref(0);
@@ -161,7 +188,7 @@ const fetchReport = async () => {
   try {
     var params = {
       p: currentPage.value,
-      status: "未审核"
+      status: "未审核",
     };
     console.log(params);
     const response = await axiosInstance.get("/report/list/", {
@@ -201,6 +228,7 @@ const handleUpdate = async () => {
       "/report/detail/" + selectedReport.value.id + "/",
       {
         results: selectedReport.value.results,
+        result: selectedReport.value.result,
       }
     );
     fetchReport();
@@ -209,6 +237,45 @@ const handleUpdate = async () => {
     ElMessage.error("更新失败");
   }
 };
+const fetchData = async () => {
+  const date = new Date();
+  const formattedDate =
+    date.getFullYear() +
+    "-" +
+    (date.getMonth() + 1).toString().padStart(2, "0") +
+    "-" +
+    date.getDate().toString().padStart(2, "0");
+  date.setTime(date.getTime() + 86400000);
+  const formattedDate1 =
+    date.getFullYear() +
+    "-" +
+    (date.getMonth() + 1).toString().padStart(2, "0") +
+    "-" +
+    date.getDate().toString().padStart(2, "0");
+  const response = await axiosInstance.get("/patient/list/", {
+    params: {
+      start_time: formattedDate,
+      end_time: formattedDate1,
+    },
+  });
+  option.value.dataset.source[1][1] = response.data.count;
+  const response1 = await axiosInstance.get("/report/list/", {
+    params: {
+      start_time: formattedDate,
+      end_time: formattedDate1,
+    },
+  });
+  option.value.dataset.source[2][1] = response1.data.count;
+  const response2 = await axiosInstance.get("/report/list/", {
+    params: {
+      status: "未审核",
+      start_time: formattedDate,
+      end_time: formattedDate1,
+    },
+  });
+  option.value.dataset.source[3][1] = response2.data.count;
+  initChart();
+};
 const handleCurrentChange = (val: number) => {
   currentPage.value = val;
   fetchReport();
@@ -216,28 +283,28 @@ const handleCurrentChange = (val: number) => {
 </script>
 
 <style>
-.todo{
+.todo {
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
 }
 
 .xray {
-  flex:1;
+  flex: 1;
   width: 100%;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  overflow-y: auto;
 }
 
 #reportPagination {
-  width:100%;
+  width: 100%;
 }
 .dashboard {
   display: flex;
   width: 100%;
-  height: 400px;
+  height: 200px;
 }
 #gauge1 {
   width: 50%;
@@ -249,6 +316,6 @@ const handleCurrentChange = (val: number) => {
 }
 #bar-chart {
   width: 100%;
-  height: 400px;
+  height: 200px;
 }
 </style>

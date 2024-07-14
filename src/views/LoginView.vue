@@ -142,7 +142,7 @@ async function loginUser() {
       if (res.data.is_superuser) {
         router.push("/default/users");
       } else{
-        router.push("/default/patient");
+        router.push("/default/todo");
       }
     } else {
       ElMessage({

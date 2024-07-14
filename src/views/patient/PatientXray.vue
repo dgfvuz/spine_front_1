@@ -45,6 +45,7 @@
       <p>患者名称: {{ selectedReport.patient_name }}</p>
       <div>
         <span>报告结果:</span>
+      <el-input v-model="selectedReport.result"></el-input>
         <div v-for="key in parts">
           <span>{{ key }}</span>
           <el-input v-model="selectedReport.results[key]['cobb']"></el-input>

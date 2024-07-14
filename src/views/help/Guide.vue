@@ -82,8 +82,6 @@ renderPdfPage();
 
 </style> -->
 
-
-
 <template>
   <div class="about">
     <h1>帮助</h1>
@@ -91,10 +89,8 @@ renderPdfPage();
 </template>
 
 <style>
-  .about {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-  }
-
+.about {
+  height: 100%;
+  width: 100%;
+}
 </style>

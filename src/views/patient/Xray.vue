@@ -1,37 +1,48 @@
 <template>
-  <div class="xray">
-    <el-card
-      v-for="item in ReportDatas"
-      style="height: 400px; overflow-y: auto"
-    >
-      <p>患者名称: {{ item.patient_name }}</p>
-      <el-image
+  <div id="xray-all">
+    <!-- 这里做一个比较小的form -->
+    <el-form :inline="true">
+      <el-form-item label="姓名">
+        <el-input v-model="nameFilter" placeholder="请输入姓名"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="default" @click="fetchReport">搜索</el-button>
+      </el-form-item>
+    </el-form>
+    <div class="xray">
+      <el-card
+        v-for="item in ReportDatas"
+        style="height: 200px; overflow-y: auto"
+      >
+        <p>患者名称: {{ item.patient_name }}</p>
+        <!-- <el-image
         style="width: 100px; height: 100px"
         :src="item.X_ray"
         fit="contain"
-      />
-      <p>报告结果: {{ processResults(item.results) }}</p>
-      <p>报告状态: {{ item.status }}</p>
-      <p>更新时间: {{ item.update_time }}</p>
-      <div>
-        <el-button type="primary" @click="reportDetail(item)"
-          >查看详情</el-button
-        >
-        <el-button type="primary" @click="handleRegenerate(item)"
-          >重新生成</el-button
-        >
-        <el-button type="primary" @click="handleDelete(item)">删除</el-button>
-      </div>
-    </el-card>
-  </div>
-  <el-pagination
+        /> -->
+        <p>报告结果: {{ processResults(item.results) }}</p>
+        <p>报告状态: {{ item.status }}</p>
+        <p>更新时间: {{ item.update_time }}</p>
+        <div>
+          <el-button type="primary" @click="reportDetail(item)"
+            >查看详情</el-button
+          >
+          <el-button type="primary" @click="handleRegenerate(item)"
+            >重新生成</el-button
+          >
+          <el-button type="primary" @click="handleDelete(item)">删除</el-button>
+        </div>
+      </el-card>
+    </div>
+    <el-pagination
       @current-change="handleCurrentChange"
       :current-page="currentPage"
       :page-size="10"
       layout="prev, pager, next"
       :total="totalNum"
-        id="reportPagination"
+      id="reportPagination"
     ></el-pagination>
+  </div>
   <el-dialog
     title="报告详情"
     v-model="reportDetailVisiable"
@@ -45,6 +56,7 @@
     <p>患者名称: {{ selectedReport.patient_name }}</p>
     <div>
       <span>报告结果:</span>
+      <el-input v-model="selectedReport.result"></el-input>
       <div v-for="key in parts">
         <span>{{ key }}</span>
         <el-input v-model="selectedReport.results[key]['cobb']"></el-input>
@@ -73,6 +85,7 @@ const totalNum = ref(0);
 const selectedReport = ref(null);
 const reportDetailVisiable = ref(false);
 const currentPage = ref(1);
+const nameFilter = ref("");
 const parts = ref(["颈胸弯", "上胸弯", "胸弯", "胸弯2", "胸腰弯", "腰弯"]);
 const others = ref([
   "冠状面平衡",
@@ -112,8 +125,9 @@ const processResults = (results: any) => {
 };
 const fetchReport = async () => {
   try {
-    var params = {
+    const params = {
       p: currentPage.value,
+      ...(nameFilter.value !== "" && { patient_name: nameFilter.value }),
     };
     const response = await axiosInstance.get("/report/list/", {
       params: params,
@@ -152,7 +166,8 @@ const handleUpdate = async () => {
       "/report/detail/" + selectedReport.value.id + "/",
       {
         results: selectedReport.value.results,
-        status: "已审核"
+        status: "已审核",
+        result: selectedReport.value.result,
       }
     );
     fetchReport();
@@ -169,15 +184,22 @@ const handleCurrentChange = (val: number) => {
 
 <style>
 .xray {
+  flex: 1;
   width: 100%;
   height: 95%;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   overflow-y: auto;
 }
+#xray-all {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
 
 #reportPagination {
   height: 5%;
-  width:100%;
+  width: 100%;
 }
 </style>
