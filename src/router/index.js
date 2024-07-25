@@ -66,6 +66,12 @@ const router = createRouter({
           meta: { isAuth: true, isAdmin: false,showMenu:false},
         },
         {
+          path: "xrayDetail",
+          name: "X光详情",
+          component: () => import("@/views/patient/XrayDetail.vue"),
+          meta: { isAuth: true, isAdmin: false,showMenu:false},
+        },
+        {
           path:"data",
           name: "数据统计",
           component: () => import("@/views/data/AllData.vue"),

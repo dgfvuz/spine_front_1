@@ -43,36 +43,6 @@
       id="reportPagination"
     ></el-pagination>
   </div>
-  <el-dialog
-    title="报告详情"
-    v-model="reportDetailVisiable"
-    style="width: 100%; height: 100%; display: flex"
-  >
-    <el-image
-      style="width: 100px; height: 100px"
-      :src="selectedReport.X_ray"
-      fit="contain"
-    />
-    <p>患者名称: {{ selectedReport.patient_name }}</p>
-    <div>
-      <span>报告结果:</span>
-      <el-input v-model="selectedReport.result"></el-input>
-      <div v-for="key in parts">
-        <span>{{ key }}</span>
-        <el-input v-model="selectedReport.results[key]['cobb']"></el-input>
-      </div>
-      <div v-for="key in others">
-        <span>{{ key }}</span>
-        <el-input v-model="selectedReport.results[key]"></el-input>
-      </div>
-    </div>
-    <p>报告状态: {{ selectedReport.status }}</p>
-    <p>更新时间: {{ selectedReport.update_time }}</p>
-    <el-button type="primary" @click="handleUpdate">更新</el-button>
-    <el-button type="primary" @click="reportDetailVisiable = false"
-      >关闭</el-button
-    >
-  </el-dialog>
 </template>
 
 <script lang="ts" setup>
@@ -80,23 +50,11 @@ import { ref } from "vue";
 import { useUserStore } from "@/stores/user";
 import axiosInstance from "@/http";
 import { ElMessage } from "element-plus";
+import router from "@/router";
 const ReportDatas = ref([]);
 const totalNum = ref(0);
-const selectedReport = ref(null);
-const reportDetailVisiable = ref(false);
 const currentPage = ref(1);
 const nameFilter = ref("");
-const parts = ref(["颈胸弯", "上胸弯", "胸弯", "胸弯2", "胸腰弯", "腰弯"]);
-const others = ref([
-  "冠状面平衡",
-  "锁骨角",
-  "csvl",
-  "c7vl",
-  "顶椎偏距",
-  "胸廓躯干倾斜",
-  "影像学肩高度",
-  "胸1锥体倾斜角",
-]);
 const processResults = (results: any) => {
   var result = [];
   if (results === null) {
@@ -149,8 +107,12 @@ const handleDelete = async (item: { id: string }) => {
   }
 };
 const reportDetail = (item: any) => {
-  selectedReport.value = item;
-  reportDetailVisiable.value = true;
+  if (item.status === "生成中") {
+    ElMessage.error("报告生成中，无法查看详情");
+    return;
+  }
+  useUserStore().selectedReport = item;
+  router.push("/default/xrayDetail");
 };
 const handleRegenerate = async (item: { id: string }) => {
   try {
@@ -158,22 +120,6 @@ const handleRegenerate = async (item: { id: string }) => {
     ElMessage.success("重新生成成功，请一段时间后刷新页面查看新报告");
   } catch (error) {
     ElMessage.error("重新生成失败");
-  }
-};
-const handleUpdate = async () => {
-  try {
-    await axiosInstance.patch(
-      "/report/detail/" + selectedReport.value.id + "/",
-      {
-        results: selectedReport.value.results,
-        status: "已审核",
-        result: selectedReport.value.result,
-      }
-    );
-    fetchReport();
-    ElMessage.success("更新成功");
-  } catch (error) {
-    ElMessage.error("更新失败");
   }
 };
 const handleCurrentChange = (val: number) => {

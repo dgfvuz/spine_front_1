@@ -1,36 +1,45 @@
-
 <template>
   <div class="default-layout">
-    <el-page-header
-          class="header"
-          @back="handleBack"
-          :icon="null"
-          >
-          <template #title >
-              <span class="headerTitle">脊柱侧弯X光系统</span>
-          </template>
-          <template #content >
-              <el-avatar :src="useUserStore().user.avatar"  class="userAvatar"/>
-              <span class="userName">{{ useUserStore().user.name }}</span>
-            </template>
-          <!-- 下拉菜单 -->
-          <el-dropdown>
-    <span>
-      更多操作
-      <el-icon>
-        <arrow-down />
-      </el-icon>
-    </span>
-    <template #dropdown>
-      <el-dropdown-menu>
-        <el-dropdown-item @click="clickUpdate">修改资料</el-dropdown-item>
-        <el-dropdown-item @click="clickChangePassword">修改密码</el-dropdown-item>
-        <el-dropdown-item @click="triggerFileInput">上传头像</el-dropdown-item>
-        <el-dropdown-item @click="logout">退出登录</el-dropdown-item>
-      </el-dropdown-menu>
-    </template>
-  </el-dropdown>
-        </el-page-header>
+    <el-page-header class="header" @back="handleBack" :icon="null">
+      <template #title>
+        <span class="headerTitle">脊柱侧弯X光系统</span>
+      </template>
+      <template #content>
+        <el-avatar
+          :src="
+            config.replace
+              ? useUserStore().user.avatar.replace(
+                  config.transformedUrl,
+                  config.apiBaseUrl
+                )
+              : useUserStore().user.avatar
+          "
+          class="userAvatar"
+        />
+        <span class="userName">{{ useUserStore().user.name }}</span>
+      </template>
+      <!-- 下拉菜单 -->
+      <el-dropdown>
+        <span>
+          更多操作
+          <el-icon>
+            <arrow-down />
+          </el-icon>
+        </span>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item @click="clickUpdate">修改资料</el-dropdown-item>
+            <el-dropdown-item @click="clickChangePassword"
+              >修改密码</el-dropdown-item
+            >
+            <el-dropdown-item @click="triggerFileInput"
+              >上传头像</el-dropdown-item
+            >
+            <el-dropdown-item @click="logout">退出登录</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+    </el-page-header>
     <div class="rest-content">
       <div class="menuBody">
         <aside class="menu">
@@ -43,11 +52,7 @@
         </main>
       </div>
     </div>
-    <el-dialog
-      v-model="userFormVisible"
-      title="更改资料"
-      width="800"
-    >
+    <el-dialog v-model="userFormVisible" title="更改资料" width="800">
       <el-form :model="editFormData">
         <el-form-item label="账号" label-width="120px">
           <el-input
@@ -89,11 +94,7 @@
         <el-button @click="onEditCancel">Cancel</el-button>
       </el-form-item>
     </el-dialog>
-    <el-dialog
-      v-model="passwordFormVisible"
-      title="修改密码"
-      width="400"
-    >
+    <el-dialog v-model="passwordFormVisible" title="修改密码" width="400">
       <el-form :model="passwordForm">
         <el-form-item label="旧密码" label-width="120px">
           <el-input
@@ -120,35 +121,49 @@
           ></el-input>
         </el-form-item>
         <el-form-item>
-        <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
-      </el-form-item>
+          <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
+        </el-form-item>
       </el-form>
       <el-form-item>
         <el-button type="primary" @click="onPasswordSubmit">确认</el-button>
         <el-button @click="onPasswordCancel">Cancel</el-button>
       </el-form-item>
     </el-dialog>
-    <input type="file" ref="fileInput" @change="handleFileUpload" accept="image/*" style="display: none;" />
+    <input
+      type="file"
+      ref="fileInput"
+      @change="handleFileUpload"
+      accept="image/*"
+      style="display: none"
+    />
   </div>
 </template>
 <script lang="ts" setup>
-import Header from '../components/Header.vue'
-import MenuView from '../components/MenuView.vue'
-import { RouterView } from 'vue-router';
-import router from '@/router'
+import Header from "../components/Header.vue";
+import MenuView from "../components/MenuView.vue";
+import { RouterView } from "vue-router";
+import router from "@/router";
 import { useUserStore } from "@/stores/user";
-import { ArrowDown } from '@element-plus/icons-vue'
-import { ElDropdown, ElDropdownItem, ElDropdownMenu, ElAvatar, ElPageHeader, ElIcon } from 'element-plus'
-import axiosInstance from '@/http'
-import { ElMessage } from 'element-plus'
-import { onMounted } from 'vue'
-import { ref } from 'vue'
+import { ArrowDown } from "@element-plus/icons-vue";
+import {
+  ElDropdown,
+  ElDropdownItem,
+  ElDropdownMenu,
+  ElAvatar,
+  ElPageHeader,
+  ElIcon,
+} from "element-plus";
+import axiosInstance from "@/http";
+import { ElMessage } from "element-plus";
+import { onMounted } from "vue";
+import { ref } from "vue";
+import config from "@/config";
 var fileInput = ref(null);
 var imageFile = ref(null);
 
-const triggerFileInput = ()=> {
+const triggerFileInput = () => {
   fileInput.value.click();
-}
+};
 const handleFileUpload = (event) => {
   const uploadedFile = event.target.files[0];
   console.log("what?");
@@ -161,7 +176,7 @@ const handleFileUpload = (event) => {
     imageFile.value = uploadedFile;
     updateImage();
   }
-}
+};
 const fetchUser = async () => {
   const response = await axiosInstance.get(
     "/user/users/" + useUserStore().user.account + "/"
@@ -177,37 +192,37 @@ const fetchUser = async () => {
   console.log(useUserStore().user.avatar);
   console.log(response.data);
 };
-const updateImage = async () =>{
-    var data = {
-      avatar: imageFile.value,
-    };
-    try {
-      const response = await axiosInstance.patch(
-        "/user/users/" + useUserStore().user.account + "/",
-        data,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      console.log("文件上传成功:", response.data);
-      fetchUser();
-    } catch (error) {
-      console.error("文件上传失败:", error);
-    }
-}
-const errorMessage = ref("")
-const userFormVisible = ref(false)
-const passwordFormVisible = ref(false)
+const updateImage = async () => {
+  var data = {
+    avatar: imageFile.value,
+  };
+  try {
+    const response = await axiosInstance.patch(
+      "/user/users/" + useUserStore().user.account + "/",
+      data,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    console.log("文件上传成功:", response.data);
+    fetchUser();
+  } catch (error) {
+    console.error("文件上传失败:", error);
+  }
+};
+const errorMessage = ref("");
+const userFormVisible = ref(false);
+const passwordFormVisible = ref(false);
 const passwordForm = ref({
   old_password: "",
   new_password: "",
   confirm_password: "",
-})
+});
 const handleBack = () => {
-  router.go(-1)
-}
+  router.go(-1);
+};
 
 const editFormData = ref({
   account: useUserStore().user.account,
@@ -220,7 +235,7 @@ const editFormData = ref({
 });
 
 const clickUpdate = () => {
-  fetchUser()
+  fetchUser();
   editFormData.value = {
     account: useUserStore().user.account,
     name: useUserStore().user.name,
@@ -229,13 +244,13 @@ const clickUpdate = () => {
     is_active: useUserStore().user.is_active,
     is_staff: useUserStore().user.is_staff,
     is_superuser: useUserStore().user.is_superuser,
-  }
-  userFormVisible.value = true
-}
+  };
+  userFormVisible.value = true;
+};
 
 const clickChangePassword = () => {
-  passwordFormVisible.value = true
-}
+  passwordFormVisible.value = true;
+};
 
 const onEditSubmit = async () => {
   try {
@@ -264,8 +279,8 @@ const onEditCancel = () => {
   userFormVisible.value = false;
 };
 const logout = () => {
-  router.push('/login')
-}
+  router.push("/login");
+};
 
 const onPasswordSubmit = async () => {
   if (passwordForm.value.new_password !== passwordForm.value.confirm_password) {
@@ -299,14 +314,12 @@ const onPasswordSubmit = async () => {
 const onPasswordCancel = () => {
   passwordFormVisible.value = false;
 };
-
 </script>
 <style scoped>
-.error{
+.error {
   color: red;
-
 }
-.headerTitle{
+.headerTitle {
   font-size: 1.5em;
 }
 
@@ -333,18 +346,18 @@ const onPasswordCancel = () => {
   flex: 1;
 }
 .body {
-    /* 右侧滚动条 */
+  /* 右侧滚动条 */
   /* 占满父容器 */
   height: 100%;
   padding: 1em;
   padding-bottom: 10px;
   width: 100%;
 }
-.nameAndAvatar{
+.nameAndAvatar {
   display: flex;
   flex-direction: row;
 }
-.avatarimg{
+.avatarimg {
   height: 50px;
   /* 设置宽度和高度一样大 */
   width: 50px;
@@ -353,25 +366,25 @@ const onPasswordCancel = () => {
   margin-right: 1em;
   object-fit: cover;
 }
-.content-title{
+.content-title {
   height: 100%;
   font-size: 1.5em;
   margin-right: 1em;
   /* 字体竖直居中 */
 }
 /* 对header_name写样式 */
-#header_name{
+#header_name {
   margin-right: 1em;
   font-size: 1.5em;
 }
-.header{
+.header {
   width: 100%;
   height: 8%;
   padding-right: 1em;
   display: flex;
   justify-content: space-between;
 }
-.userName{
+.userName {
   font-size: 1em;
   margin-left: 1em;
 }

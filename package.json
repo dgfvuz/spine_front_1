@@ -18,6 +18,8 @@
     "echarts": "^5.5.1",
     "electron-reload": "^2.0.0-alpha.1",
     "element-plus": "^2.6.3",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2",
     "pinia": "^2.1.7",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"

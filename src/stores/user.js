@@ -19,6 +19,7 @@ export const useUserStore = defineStore('user', () => {
     // 其他用户信息字段
   })
   const selectPatientId = ref(null)
+  const selectedReport = ref(null)
 
-  return { user , selectPatientId }
+  return { user , selectPatientId  , selectedReport }
 })
