@@ -557,11 +557,11 @@ async function drawImageBoundingBox(img: HTMLImageElement): Promise<string> {
 }
 
 const downloadReport = async () => {
-  // const loading = ElLoading.service({
-  //   lock: true,
-  //   text: "Loading",
-  //   background: "rgba(0, 0, 0, 0.7)",
-  // });
+  const loading = ElLoading.service({
+    lock: true,
+    text: "Loading",
+    background: "rgba(0, 0, 0, 0.7)",
+  });
   try {
     console.log("download report");
     // 创建PDF文档实例
@@ -688,9 +688,9 @@ const downloadReport = async () => {
     ElMessage.success("成功添加页码");
     doc.save("medical-report.pdf");
     ElMessage.success("导出报告成功");
-    // loading.close();
+    loading.close();
   } catch (error) {
-    // loading.close();
+    loading.close();
     ElMessage.error("导出报告失败");
   }
 };
