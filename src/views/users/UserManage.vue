@@ -252,9 +252,6 @@ const filterTableData = computed(() => {
   });
 });
 
-// onMounted(() => {
-//     console.log("onMounted");
-// })
 const fetchData = async () => {
   try {
     const response = await axiosInstance.get("/user/users/");
@@ -263,7 +260,6 @@ const fetchData = async () => {
       message: "获取数据成功",
       type: "success",
     });
-    console.log("fetchData");
   } catch (error) {
     ElMessage({
       message: "获取数据失败",
@@ -276,14 +272,12 @@ fetchData();
 const searchAccount = ref("");
 const searchName = ref("");
 const handleEdit = (index: number, row: any) => {
-  console.log(index, row);
   // row去掉avatar字段
   delete row.avatar;
   editFormData.value = row;
   editUserdialogTableVisible.value = true;
 };
 const handleDelete = async (index: number, row: any) => {
-  console.log(index, row);
   // 删除用户
   try {
     const response = await axiosInstance.delete(
@@ -295,7 +289,6 @@ const handleDelete = async (index: number, row: any) => {
         message: "删除成功",
         type: "success",
       });
-      console.log("删除成功");
     }
   } catch (error) {
     ElNotification({
@@ -333,9 +326,7 @@ const onSubmit = async () => {
         message: "创建成功",
         type: "success",
       });
-      console.log("创建成功");
     }
-    console.log(response);
     fetchData();
     dialogTableVisible.value = false;
   } catch (error) {
@@ -360,9 +351,7 @@ const onEditSubmit = async () => {
         message: "更新成功",
         type: "success",
       });
-      console.log("更新成功");
     }
-    console.log(response);
     fetchData();
     editUserdialogTableVisible.value = false;
   } catch (error) {
@@ -391,7 +380,6 @@ const handleResetPassword = async () => {
           message: "用户" + selectedRows.value[i].account + "重置成功",
           type: "success",
         });
-        console.log("重置密码成功");
       }
     } catch (error) {
       ElMessage({
@@ -404,7 +392,6 @@ const handleResetPassword = async () => {
 };
 const handleSelectionChange = (val: any) => {
   selectedRows.value = val;
-  console.log(selectedRows.value);
 };
 const handleBatchDelete = async () => {
   // 遍历selectedRows
@@ -418,7 +405,6 @@ const handleBatchDelete = async () => {
           message: "用户" + selectedRows.value[i].account + "删除成功",
           type: "success",
         });
-        console.log("删除成功");
       }
     } catch (error) {
       ElMessage({
@@ -445,7 +431,6 @@ const handleBatchSuperuser = async () => {
           message: "用户" + selectedRows.value[i].account + "权限取反成功",
           type: "success",
         });
-        console.log("权限取反成功");
       }
     } catch (error) {
       ElMessage({

@@ -350,7 +350,6 @@ const selectedRows = ref([]);
 const createDialogVisible = ref(false);
 const handleCurrentChange = (val: number) => {
   current_page.value = val;
-  console.log(current_page.value);
   fetchPatients();
 };
 const handleCreate = async () => {
@@ -377,7 +376,6 @@ const handleVisiable = () => {
   createDialogVisible.value = true;
 };
 const handleEdit = (index: number, row: any) => {
-  console.log("edit", index, row);
   editPatient.value = row;
   editPatientDialogVisible.value = true;
 };
@@ -500,7 +498,6 @@ const handleUpdatePatient = async () => {
   }
 };
 const handleAddReport = (index: number, row: any) => {
-  console.log("add report", index, row);
   report.value.patient = row.id;
   createReportDialogVisible.value = true;
 };
@@ -517,7 +514,6 @@ function handleFileUpload(event: any) {
       return;
     }
     XRayImage.value = uploadedFile;
-    console.log(XRayImage.value);
   } else {
     ElMessage({
       message: "上传失败，重新上传",
@@ -527,7 +523,6 @@ function handleFileUpload(event: any) {
 }
 const handleCreateReport = async () => {
   try {
-    console.log("这是post"+XRayImage.value);
     const response = await axiosInstance.post("/report/create/", {
       patient: report.value.patient,
       X_ray: XRayImage.value,

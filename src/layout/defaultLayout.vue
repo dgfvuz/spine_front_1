@@ -166,7 +166,6 @@ const triggerFileInput = () => {
 };
 const handleFileUpload = (event) => {
   const uploadedFile = event.target.files[0];
-  console.log("what?");
   if (uploadedFile) {
     // 检查文件类型
     if (!["image/jpeg", "image/png", "image/gif"].includes(uploadedFile.type)) {
@@ -188,9 +187,6 @@ const fetchUser = async () => {
   useUserStore().user.is_staff = response.data.is_staff;
   useUserStore().user.is_superuser = response.data.is_superuser;
   useUserStore().user.avatar = response.data.avatar;
-  console.log("fetchUser");
-  console.log(useUserStore().user.avatar);
-  console.log(response.data);
 };
 const updateImage = async () => {
   var data = {
@@ -206,7 +202,6 @@ const updateImage = async () => {
         },
       }
     );
-    console.log("文件上传成功:", response.data);
     fetchUser();
   } catch (error) {
     console.error("文件上传失败:", error);
@@ -263,9 +258,7 @@ const onEditSubmit = async () => {
         message: "更新成功",
         type: "success",
       });
-      console.log("更新成功");
     }
-    console.log(response);
     userFormVisible.value = false;
   } catch (error) {
     ElMessage({
@@ -301,10 +294,8 @@ const onPasswordSubmit = async () => {
     passwordForm.value.confirm_password = "";
     if (response.status === 200) {
       ElMessage.success("密码修改成功");
-      console.log("changePassword");
     } else {
       ElMessage.error("密码修改失败");
-      console.log("changePassword");
     }
     passwordFormVisible.value = false;
   } catch (error) {

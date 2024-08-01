@@ -79,7 +79,6 @@ const fetchData = async () => {
 };
 
 const render = () => {
-  console.log("render");
   const ageData = echarts.init(document.getElementById("ageData"));
   ageData.setOption(ageDataOption.value);
 };

@@ -20,7 +20,6 @@ function triggerFileInput() {
 
 function handleFileUpload(event) {
   const uploadedFile = event.target.files[0];
-  console.log("what?");
   if (uploadedFile) {
     // 检查文件类型
     if (!["image/jpeg", "image/png", "image/gif"].includes(uploadedFile.type)) {
@@ -43,9 +42,6 @@ const fetchUser = async () => {
   useUserStore().user.is_staff = response.data.is_staff;
   useUserStore().user.is_superuser = response.data.is_superuser;
   useUserStore().user.avatar = response.data.avatar;
-  console.log("fetchUser");
-  console.log(useUserStore().user.avatar);
-  console.log(response.data);
 };
 const updateImage = async () =>{
     var data = {

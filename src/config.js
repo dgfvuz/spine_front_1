@@ -1,8 +1,8 @@
 // config.js
 export default {
-  replace:false,  
+  replace:true,  
   transformedUrl : "http://localhost:8000",
-  apiBaseUrl: "http://localhost:8000",
+  apiBaseUrl: "/api",
   timeout: 5000,
   debug: true,
   // 添加其他全局配置项

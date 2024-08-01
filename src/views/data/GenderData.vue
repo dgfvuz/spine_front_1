@@ -80,7 +80,6 @@ const fetchData = async () => {
 };
 
 const render = () => {
-  console.log("render");
   const genderData = echarts.init(document.getElementById("genderData"));
   genderData.setOption(genderDataOption.value);
 };

@@ -147,7 +147,6 @@ const fetchReport = async () => {
       p: currentPage.value,
       status: "未审核",
     };
-    console.log(params);
     const response = await axiosInstance.get("/report/list/", {
       params: params,
     });

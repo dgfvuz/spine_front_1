@@ -54,10 +54,8 @@ const changePassword = async () => {
     confirmPassword.value = "";
     if (response.status === 200) {
       ElMessage.success("密码修改成功");
-      console.log("changePassword");
     } else {
       ElMessage.error("密码修改失败");
-      console.log("changePassword");
     }
   } catch (error) {
     ElMessage.error("密码修改失败");

@@ -15,12 +15,11 @@ const axiosInstance = axios.create({
 // 添加请求拦截器
 axiosInstance.interceptors.request.use(
   function (config) {
-    console.log(useUserStore().user)
     if (useUserStore().user.is_logged_in) {
         config.headers.Authorization = `Bearer ${useUserStore().user.token}`;
-        console.log('添加token', config.headers.Authorization)
+        // console.log('添加token', config.headers.Authorization)
     }
-    console.log('请求拦截器', config);
+    // console.log('请求拦截器', config);
     return config;
   },
   function (error) {
@@ -33,7 +32,7 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   function (response) {
     // 对响应数据做点什么
-    console.log('响应拦截器', response);
+    // console.log('响应拦截器', response);
     return response;
   },
   function (error) {

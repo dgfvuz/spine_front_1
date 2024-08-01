@@ -20,19 +20,9 @@
             show-password
         />
       </el-form-item>
-      <el-form-item v-if="is_register" label="确认密码" prop="checkPass">
-        <el-input
-          v-model="ruleForm.checkPass"
-          type="password"
-          autocomplete="off"
-        />
-      </el-form-item>
-      <el-form-item v-if="is_register" label="注册码">
-        <el-input v-model="ruleForm.register_code" autocomplete="off" />
-      </el-form-item>
 
       <el-form-item>
-        <el-button type="primary" @click="submitForm(ruleFormRef)" class="login"
+        <el-button type="primary" @click="submitForm()" class="login"
           >登录</el-button
         >
       </el-form-item>
@@ -95,17 +85,8 @@ const rules = reactive<FormRules<typeof ruleForm>>({
   account: [{ validator: checkUserName, trigger: "blur" }],
 });
 
-const submitForm = (formEl: FormInstance | undefined) => {
-  if (!formEl) return;
-  formEl.validate((valid) => {
-    if (valid) {
-      console.log("submit!");
-      loginUser();
-    } else {
-      console.log("error submit!");
-      return false;
-    }
-  });
+const submitForm = () => {
+  loginUser();
 };
 const fetchUser = async () => {
   const response = await axiosInstance.get(
@@ -118,9 +99,6 @@ const fetchUser = async () => {
   useUserStore().user.is_staff = response.data.is_staff;
   useUserStore().user.is_superuser = response.data.is_superuser;
   useUserStore().user.avatar = response.data.avatar;
-  console.log("fetchUser");
-  console.log(useUserStore().user.avatar);
-  console.log(response.data);
 };
 async function loginUser() {
   try {
@@ -133,8 +111,6 @@ async function loginUser() {
       useUserStore().user.is_logged_in = true;
       useUserStore().user.is_superuser = res.data.is_superuser;
       fetchUser();
-      console.log("响应数据");
-      console.log(res.data);
       ElMessage({
         message: "登录成功",
         type: "success",

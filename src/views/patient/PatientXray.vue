@@ -44,8 +44,6 @@
   const totalNum = ref(0);
   const currentPage = ref(1);
   const patientId = useUserStore().selectPatientId
-  console.log("这是patientId", patientId)
-  console.log("这是router", router)
   const processResults = (results: any) => {
     var result = [];
     if (results === null) {
@@ -78,7 +76,6 @@
         p: currentPage.value,
         patient: patientId,
       };
-      console.log(params);
       const response = await axiosInstance.get("/report/list/", {
         params: params,
       });

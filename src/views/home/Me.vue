@@ -86,9 +86,6 @@ const fetchUser = async () => {
   useUserStore().user.is_staff = response.data.is_staff;
   useUserStore().user.is_superuser = response.data.is_superuser;
   useUserStore().user.avatar = response.data.avatar;
-  console.log("fetchUser");
-  console.log(useUserStore().user.avatar);
-  console.log(response.data);
 };
 const updateUser = async () => {
   var data;
@@ -144,7 +141,6 @@ form = user;
 
 const saveChanges = () => {
   updateUser();
-  console.log("saveChanges");
   // 重新加载这个页面,刷新页面
   fetchUser();
   form = useUserStore().user;

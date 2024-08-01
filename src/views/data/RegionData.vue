@@ -95,7 +95,6 @@ const fetchData = async () => {
   render();
 };
 const render = () => {
-  console.log("render");
   const regionData = echarts.init(document.getElementById("regionData"));
   regionData.setOption(regionDataOption.value);
 };

@@ -13,8 +13,6 @@
   import { ref } from 'vue'
   import { useUserStore } from "@/stores/user";
   const menuData = ref(router.options.routes.filter(route => (route.path === '/default'))[0].children.filter(subItem => (subItem.meta.isAdmin === useUserStore().user.is_superuser) && subItem.meta.showMenu))
-  console.log(menuData.value)
-  console.log("上面是menuData")
   // 在加载页面的时候执行的函数
   const subMenuVisibility = ref({})
   const toggleSubMenu = (path) => {

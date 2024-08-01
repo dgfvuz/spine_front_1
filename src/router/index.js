@@ -113,7 +113,6 @@ const router = createRouter({
 });
 router.beforeEach((to, from, next) => {
   if (to.meta.isAuth) {
-    console.log("isAuth");
     if (useUserStore().user.is_logged_in) {
       next();
     } else {
