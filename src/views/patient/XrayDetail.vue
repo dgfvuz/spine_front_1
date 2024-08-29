@@ -28,8 +28,30 @@
     <p>报告状态: {{ selectedReport.status }}</p>
     <p>更新时间: {{ selectedReport.update_time }}</p>
     <el-button type="primary" @click="handleUpdate">更新</el-button>
-    <el-button type="primary" @click="downloadReport">导出报告</el-button>
+    <el-button type="primary" @click="downloadReportDialog">导出报告</el-button>
   </div>
+  <el-dialog v-model="dialogFormVisible" title="请选择报告的类型" width="300">
+    <div>
+      <el-checkbox
+        v-model="downloadReport_summary"
+        label="汇总页"
+        size="large"
+      />
+      <el-checkbox
+        v-model="downloadReport_detail"
+        label="详细页"
+        size="large"
+      />
+    </div>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button type="primary" @click="downloadReportComfirm">
+          确认
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <script lang="ts" setup>
@@ -42,6 +64,8 @@ import "jspdf-autotable";
 import config from "@/config";
 import { ElLoading } from "element-plus";
 
+const dialogFormVisible = ref(false);
+const formLabelWidth = "120px";
 const selectedReport = ref(useUserStore().selectedReport);
 const patient = ref(null);
 const parts = ref(["上胸弯", "胸弯", "胸弯2", "胸腰弯", "腰弯"]);
@@ -55,6 +79,8 @@ const others = ref([
   "影像学肩高度",
   "胸1锥体倾斜角",
 ]);
+const downloadReport_summary = ref(true);
+const downloadReport_detail = ref(true);
 
 type RequestHandler = (img_with_bbox: string) => Promise<string>;
 
@@ -86,7 +112,7 @@ function Cornal_balance_text(): string {
   // 冠状面平衡:保留两位小数
   // 打印类型
 
-  console.log(typeof(selectedReport.value.results["冠状面平衡"]["result"]))
+  console.log(typeof selectedReport.value.results["冠状面平衡"]["result"]);
   return `冠状面平衡如图所示:  
     ${selectedReport.value.results["冠状面平衡"]["result"].toFixed(2)}mm
 `;
@@ -109,15 +135,19 @@ function c7pl_text(): string {
 function T1_tile_angle_text(): string {
   // 胸1锥体倾斜角:保留两位小数
   return `胸1锥体倾斜角如图所示:
-    ${selectedReport.value.results["胸1锥体倾斜角"]["result"].toFixed(2)}度
+    ${selectedReport.value.results["胸1锥体倾斜角"]["result"].toFixed(2)}°
 `;
 }
 
 function avt_text(): string {
   // 顶椎偏距:保留两位小数
   return `顶椎偏距如图所示:
-    胸弯AVT: ${selectedReport.value.results["顶椎偏距"]["result"][0].toFixed(2)}mm, 
-    胸腰弯/腰弯AVT: ${selectedReport.value.results["顶椎偏距"]["result"][1].toFixed(2)}mm
+    胸弯AVT: ${selectedReport.value.results["顶椎偏距"]["result"][0].toFixed(
+      2
+    )}mm, 
+    胸腰弯/腰弯AVT: ${selectedReport.value.results["顶椎偏距"][
+      "result"
+    ][1].toFixed(2)}mm
 `;
 }
 
@@ -131,7 +161,7 @@ function rsh_text(): string {
 function clavicle_angle_text(): string {
   // 锁骨角:保留两位小数
   return `锁骨角如图所示:
-    ${selectedReport.value.results["锁骨角"]["result"].toFixed(2)}度
+    ${selectedReport.value.results["锁骨角"]["result"].toFixed(2)}°
 `;
 }
 
@@ -141,7 +171,6 @@ function TTS_text(): string {
     ${selectedReport.value.results["胸廓躯干倾斜"]["result"].toFixed(2)}mm
 `;
 }
-
 
 async function draw_TTS(image_with_bbox: string): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -253,7 +282,7 @@ async function draw_clavicle_angle(image_with_bbox: string): Promise<string> {
         let topLeftY = points[0][1];
         ctx.font = "30px STKAITI";
         ctx.fillText(
-          `锁骨角${selectedReport.value.results["锁骨角"]["result"]}度`,
+          `锁骨角${selectedReport.value.results["锁骨角"]["result"]}°`,
           topLeftX + 5,
           topLeftY + 20
         );
@@ -351,7 +380,7 @@ async function draw_T1_tile_angle(img_with_bbox: string): Promise<string> {
           selectedReport.value.results["胸1锥体倾斜角"]["points"][0][1];
         ctx.font = "30px STKAITI";
         ctx.fillText(
-          `胸1锥体倾斜角${selectedReport.value.results["胸1锥体倾斜角"]["result"]}度`,
+          `胸1锥体倾斜角${selectedReport.value.results["胸1锥体倾斜角"]["result"]}°`,
           topLeftX + 5,
           topLeftY + 20
         );
@@ -691,7 +720,7 @@ async function drawImageBoundingBox(img: HTMLImageElement): Promise<string> {
 }
 
 const downloadReport = async () => {
-  console.log(selectedReport.value)
+  console.log(selectedReport.value);
   const loading = ElLoading.service({
     lock: true,
     text: "Loading",
@@ -711,6 +740,11 @@ const downloadReport = async () => {
     let header_image = await loadHeaderImage(
       `${config.transformedUrl}/X_ray/reportHeader.JPG`
     );
+    // 设置一些常量
+    let rate = 0;
+    const image = await loadImage(selectedReport.value.X_ray);
+    let image_with_bbox = await drawImageBoundingBox(image);
+
     doc.addImage(header_image, "JPEG", 50, 10, 110, 19);
     ElMessage.success("成功添加图片Header");
 
@@ -738,98 +772,151 @@ const downloadReport = async () => {
     doc.text("报告生成时间: " + patient.value.create_time, 10, 65);
     doc.text("报告审核时间: " + selectedReport.value.update_time, 90, 65);
     doc.line(10, 68, pageWidth - 10, 68);
-
-    doc.setFontSize(14);
-    let y = 75;
-    for(let item of parts.value){
-      if(selectedReport.value.results[item]["result"] === "正常"){
-        continue;
+    if (downloadReport_summary.value) {
+      // 这里填充总结内容
+      doc.setFontSize(7);
+      let drew_image = await drawCobb(image_with_bbox);
+      rate = Math.min(200 / image.height, (pageWidth - 80) / image.width);
+      for(let item of others.value){
+        drew_image = await processOthers(item, drew_image);
       }
-      doc.text(
-        `${item}: 
-    弯曲方向: ${selectedReport.value.results[item]["result"]}
-    cobb角: ${selectedReport.value.results[item]["cobb"]}度
-    上端椎: ${selectedReport.value.results[item]["上端椎"]}
-    顶椎: ${selectedReport.value.results[item]["顶椎"]}
-    下端椎: ${selectedReport.value.results[item]["下端椎"]}
-    Nash-Moe旋转: ${selectedReport.value.results[item]["Nash-Moe旋转"]}`,
-        10,
-        y
-      );
-      y += 40;
-    }
-    ElMessage.success("成功添加报告内容");
-    const image = await loadImage(selectedReport.value.X_ray);
-    let rate = Math.min(200 / image.height, (pageWidth - 80) / image.width);
-    let image_with_bbox = await drawImageBoundingBox(image);
-    let image_with_cobb = await drawCobb(image_with_bbox);
-    doc.addImage(
-      image_with_cobb,
-      "JPEG",
-      pageWidth - (image.width * rate) - 25,
-      75,
-      image.width * rate,
-      image.height * rate
-    );
-    ElMessage.success("成功添加图片");
-    // 冠状面平衡: ${selectedReport.value.results["冠状面平衡"]["result"]}
-    // 锁骨角: ${selectedReport.value.results["锁骨角"]["result"]}
-    // csvl: ${selectedReport.value.results["csvl"]["result"]}
-    // c7vl: ${selectedReport.value.results["c7pl"]["result"]}
-    // 顶椎偏距: ${selectedReport.value.results["顶椎偏距"]["result"]}
-    // 胸廓躯干倾斜: ${selectedReport.value.results["胸廓躯干倾斜"]["result"]}
-    // 影像学肩高度: ${selectedReport.value.results["影像学肩高度"]["result"]}
-    // 胸1锥体倾斜角: ${selectedReport.value.results["胸1锥体倾斜角"]["result"]}
-    // 添加一条分割线
-    // 添加一个图片
-    const list = [
-      "冠状面平衡",
-      "锁骨角",
-      "csvl",
-      "c7pl",
-      "顶椎偏距",
-      "胸廓躯干倾斜",
-      "影像学肩高度",
-      "胸1锥体倾斜角",
-    ];
-    for (let i = 0; i < list.length; i++) {
-      doc.addPage();
-      doc.addImage(header_image, "JPEG", 50, 10, 110, 19);
-      doc.setFontSize(18);
-      doc.text(title, titleX, 34);
-      doc.line(10, 40, pageWidth - 10, 40);
-      doc.setFontSize(12);
-      doc.text(
-        text_handlers[list[i]](),
-        10,
-        45
-      );
-      rate = Math.min(230 / image.height, (pageWidth - 20) / image.width);
-      let img = await processOthers(list[i], image_with_bbox);
       doc.addImage(
-        img,
+        drew_image,
         "JPEG",
-        pageWidth - (image.width * rate) - 25,
-        45,
+        pageWidth - image.width * rate - 25,
+        72,
         image.width * rate,
         image.height * rate
       );
+      ElMessage.success("成功添加图片");
+      let y = 75;
+      let num = 0;
+      for(let item of parts.value){
+        if(selectedReport.value.results[item]["result"] === "正常"){
+          continue;
+        }
+        doc.text(
+          `${item}: 
+          弯曲方向: ${selectedReport.value.results[item]["result"]}
+          cobb角: ${selectedReport.value.results[item]["cobb"]}°
+          上端椎: ${selectedReport.value.results[item]["上端椎"]}
+          顶椎: ${selectedReport.value.results[item]["顶椎"]}
+          下端椎: ${selectedReport.value.results[item]["下端椎"]}
+          Nash-Moe旋转: ${selectedReport.value.results[item]["Nash-Moe旋转"]}`,
+          20 + num * (pageWidth - image.width * rate - 25 - 20)/2,
+          y
+        );
+        if(num === 0){
+          num = 1;
+        }else{
+          num = 0;
+          y += 20;
+        }
+        ElMessage.success("成功添加报告内容");
+      }
+      if (num === 1) {
+        y += 20;
+      }
+      // 画一个分割线
+      // 添加其他内容, others的text内容
+      for(let item of others.value){
+        doc.text(text_handlers[item](), 20, y + 5);
+        y += 10;
+      }
     }
 
-    // 添加页码
-    const totalPagesExp = "{total_pages_count_string}";
-    const pageCount = doc.getNumberOfPages();
-
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(10);
-      doc.line(10, 285, pageWidth - 10, 285);
-      doc.text(`Page ${i} of ${totalPagesExp}`, 10, 290);
+    if (downloadReport_detail.value) {
+      if (downloadReport_summary.value) {
+        doc.addPage();
+        doc.addImage(header_image, "JPEG", 50, 10, 110, 19);
+        doc.setFontSize(18);
+        doc.text(title, titleX, 34);
+        doc.line(10, 40, pageWidth - 10, 40);
+        doc.setFontSize(12);
+        doc.text(`患者姓名: ${selectedReport.value.patient_name}`, 10, 45);
+        doc.text("性别: " + patient.value.gender, 50, 45);
+        doc.text("年龄: " + patient.value.age, 80, 45);
+        doc.text("患者地区: " + patient.value.region, 10, 55);
+        doc.text("患者地址: " + patient.value.address, 110, 55);
+        doc.text("报告状态: " + selectedReport.value.status, 110, 45);
+        doc.text("报告生成时间: " + patient.value.create_time, 10, 65);
+        doc.text("报告审核时间: " + selectedReport.value.update_time, 90, 65);
+        doc.line(10, 68, pageWidth - 10, 68);
+      }
+      // 添加报告内容
+      doc.setFontSize(14);
+      let y = 75;
+      for (let item of parts.value) {
+        if (selectedReport.value.results[item]["result"] === "正常") {
+          continue;
+        }
+        doc.text(
+          `${item}: 
+          弯曲方向: ${selectedReport.value.results[item]["result"]}
+          cobb角: ${selectedReport.value.results[item]["cobb"]}°
+          上端椎: ${selectedReport.value.results[item]["上端椎"]}
+          顶椎: ${selectedReport.value.results[item]["顶椎"]}
+          下端椎: ${selectedReport.value.results[item]["下端椎"]}
+          Nash-Moe旋转: ${selectedReport.value.results[item]["Nash-Moe旋转"]}`,
+          10,
+          y
+        );
+        y += 40;
+        ElMessage.success("成功添加报告内容");
+        rate = Math.min(200 / image.height, (pageWidth - 80) / image.width);
+        let image_with_cobb = await drawCobb(image_with_bbox);
+        doc.addImage(
+          image_with_cobb,
+          "JPEG",
+          pageWidth - image.width * rate - 25,
+          75,
+          image.width * rate,
+          image.height * rate
+        );
+        ElMessage.success("成功添加图片");
+      }
+      const list = [
+        "冠状面平衡",
+        "锁骨角",
+        "csvl",
+        "c7pl",
+        "顶椎偏距",
+        "胸廓躯干倾斜",
+        "影像学肩高度",
+        "胸1锥体倾斜角",
+      ];
+      for (let i = 0; i < list.length; i++) {
+        doc.addPage();
+        doc.addImage(header_image, "JPEG", 50, 10, 110, 19);
+        doc.setFontSize(18);
+        doc.text(title, titleX, 34);
+        doc.line(10, 40, pageWidth - 10, 40);
+        doc.setFontSize(12);
+        doc.text(text_handlers[list[i]](), 10, 45);
+        rate = Math.min(230 / image.height, (pageWidth - 20) / image.width);
+        let img = await processOthers(list[i], image_with_bbox);
+        doc.addImage(
+          img,
+          "JPEG",
+          pageWidth - image.width * rate - 25,
+          45,
+          image.width * rate,
+          image.height * rate
+        );
+      }
+      // 添加页码
+      const totalPagesExp = "{total_pages_count_string}";
+      const pageCount = doc.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(10);
+        doc.line(10, 285, pageWidth - 10, 285);
+        doc.text(`Page ${i} of ${totalPagesExp}`, 10, 290);
+      }
+      doc.putTotalPages(totalPagesExp);
+      ElMessage.success("成功添加页码");
     }
-    doc.putTotalPages(totalPagesExp);
-
     // 保存PDF
-    ElMessage.success("成功添加页码");
     doc.save(`${selectedReport.value.patient_name}-X光检测报告.pdf`);
     ElMessage.success("导出报告成功");
     loading.close();
@@ -838,6 +925,13 @@ const downloadReport = async () => {
     loading.close();
     ElMessage.error("导出报告失败");
   }
+};
+const downloadReportDialog = () => {
+  dialogFormVisible.value = true;
+};
+const downloadReportComfirm = () => {
+  dialogFormVisible.value = false;
+  downloadReport();
 };
 </script>
 <style>
